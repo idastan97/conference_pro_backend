@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -48,6 +50,22 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+LOGGING = {
+      'version': 1,
+      'disable_existing_loggers': False,
+      'handlers': {
+          'console': {
+              'class': 'logging.StreamHandler',
+          },
+      },
+      'loggers': {
+          'django': {
+              'handlers': ['console'],
+              'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
+          },
+      },
+  }
 
 ROOT_URLCONF = 'conference_pro.urls'
 
@@ -68,6 +86,12 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'conference_pro.wsgi.application'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    )
+}
 
 
 # Database
