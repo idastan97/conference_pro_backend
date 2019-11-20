@@ -15,10 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from auth.views import Ping
+from conference_pro.auth.views import Ping
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('auth/', include('auth.urls')),
+    path('auth/', include('conference_pro.auth.urls')),
     path('ping/', Ping.as_view()),
 ]
