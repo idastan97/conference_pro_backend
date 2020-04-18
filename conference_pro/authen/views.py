@@ -4,6 +4,8 @@ from rest_framework import status
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes, api_view
+
+from .models import User_settings
 from .serializers import UserSerializer, TokenSerializer
 from django.contrib.auth import authenticate
 from django.views.decorators.csrf import csrf_exempt
@@ -43,6 +45,8 @@ class Register(APIView):
         first_name = request.data.get("first_name")
         last_name = request.data.get("last_name")
         email = request.data.get("email")
+        is_machine = request.data.get("is_machine", False)
+        print(type(is_machine))
         username = email
         print(email)
         if username is None or username == "":
@@ -60,8 +64,12 @@ class Register(APIView):
         user.first_name = first_name
         user.last_name = last_name
         user.save()
+        user.refresh_from_db()
+        user_settings = User_settings(user=user, is_machine=is_machine)
+        user_settings.save()
         token = TokenSerializer(Token.objects.get(user=user))
         return Response(status=status.HTTP_200_OK, data=token.data)
+
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'conference_pro.authen',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
