@@ -1,3 +1,5 @@
+import random
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -14,15 +16,38 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
 
+
 @permission_classes([])
 class Ping(APIView):
     def get(self, request):
         return Response(status=status.HTTP_200_OK, data="Codeforces orange")
 
+
 @permission_classes([IsAuthenticated])
 class CheckToken(APIView):
     def post(self, request):
-        return Response(status=status.HTTP_200_OK, data=request.user.username)
+        data = User_settings.objects.get(user=request.user).to_dict()
+        data['username'] = request.user.username
+        return Response(status=status.HTTP_200_OK, data=data)
+
+
+@permission_classes([IsAuthenticated])
+class SetPeerId(APIView):
+    def post(self, request):
+        user = request.user
+        user_settings = User_settings.objects.get(user=user)
+        user_settings.peer_id = request.data.get('peer_id', '')
+        user_settings.save()
+        return Response(status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAuthenticated])
+class ConnectToMachine(APIView):
+    def post(self, request):
+        user = request.user
+
+        return Response(status=status.HTTP_200_OK)
+
 
 @csrf_exempt
 @api_view(["POST"])
@@ -35,8 +60,15 @@ def login(request):
     user = authenticate(username=username, password=password)
     if not user:
         return Response({'error': 'Invalid Credentials'}, status=status.HTTP_404_NOT_FOUND)
+    user_settings = User_settings.objects.get(user=user)
+    if user_settings.is_machine:
+        user_settings.machine_password = random.randint(1000, 9999)
+    user_settings.save()
     token, _ = Token.objects.get_or_create(user=user)
-    return Response({'token': token.key}, status=status.HTTP_200_OK)
+    data = user_settings.to_dict()
+    data['username'] = user.username
+    data['token'] = token.key
+    return Response(data=data, status=status.HTTP_200_OK)
 
 @permission_classes([])
 class Register(APIView):
@@ -66,9 +98,17 @@ class Register(APIView):
         user.save()
         user.refresh_from_db()
         user_settings = User_settings(user=user, is_machine=is_machine)
+
+        if is_machine:
+            user_settings.machine_password = random.randint(1000, 9999)
         user_settings.save()
         token = TokenSerializer(Token.objects.get(user=user))
-        return Response(status=status.HTTP_200_OK, data=token.data)
+        data = user_settings.to_dict()
+        data['username'] = user.username
+        print(token.data['key'])
+        data['token'] = token.data['key']
+
+        return Response(status=status.HTTP_200_OK, data=data)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
