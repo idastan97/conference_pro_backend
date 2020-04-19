@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import permission_classes, api_view
 
+from .consumers import PeersConsumer
 from .models import User_settings
 from .serializers import UserSerializer, TokenSerializer
 from django.contrib.auth import authenticate
@@ -45,7 +46,21 @@ class SetPeerId(APIView):
 class ConnectToMachine(APIView):
     def post(self, request):
         user = request.user
+        machine_id = request.data['machine_id']
+        machine_settings = User_settings.objects.get(user_id=machine_id)
+        data = {
+            'peer_id': machine_settings.peer_id
+        }
+        return Response(data=data, status=status.HTTP_200_OK)
 
+
+@permission_classes([])
+class ConnectMachineToMe(APIView):
+    def post(self, request):
+        print(request.data)
+        # user = request.user
+        peer_id = request.data['peer_id']
+        machine_id = request.data['machine_id']
         return Response(status=status.HTTP_200_OK)
 
 

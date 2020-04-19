@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    # 'channels',
+    'channels',
     'conference_pro.authen',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,6 +57,12 @@ MIDDLEWARE = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
+
 LOGGING = {
       'version': 1,
       'disable_existing_loggers': False,
@@ -74,6 +80,7 @@ LOGGING = {
   }
 
 ROOT_URLCONF = 'conference_pro.urls'
+ASGI_APPLICATION = "conference_pro.routing.application"
 
 TEMPLATES = [
     {
