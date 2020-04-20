@@ -49,7 +49,7 @@ class ConnectToMachine(APIView):
         machine_id = request.data['machine_id']
         machine_password = request.data['machine_password']
         machine_settings = User_settings.objects.get(user_id=machine_id, machine_password=machine_password)
-        if not machine_settings:
+        if not machine_settings or machine_settings.status == 0:
             return Response(data="machine not found", status=status.HTTP_403_FORBIDDEN)
         data = {
             'peer_id': machine_settings.peer_id
