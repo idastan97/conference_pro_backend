@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import Ping, Register, CheckToken, login, SetPeerId, ConnectToMachine, ConnectMachineToMe
+from .views import Ping, Register, CheckToken, login, SetPeerId, ConnectToMachine
 
 urlpatterns = [
     path('ping/', Ping.as_view()),
@@ -8,5 +8,4 @@ urlpatterns = [
     path('checktoken/', CheckToken.as_view()),
     path('set_peer_id/', SetPeerId.as_view()),
     path('connect_to_machine/', ConnectToMachine.as_view()),
-    path('connect_machine_to_me/', ConnectMachineToMe.as_view()),
 ]

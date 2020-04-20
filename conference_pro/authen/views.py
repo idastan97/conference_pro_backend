@@ -47,21 +47,14 @@ class ConnectToMachine(APIView):
     def post(self, request):
         user = request.user
         machine_id = request.data['machine_id']
-        machine_settings = User_settings.objects.get(user_id=machine_id)
+        machine_password = request.data['machine_password']
+        machine_settings = User_settings.objects.get(user_id=machine_id, machine_password=machine_password)
+        if not machine_settings:
+            return Response(data="machine not found", status=status.HTTP_403_FORBIDDEN)
         data = {
             'peer_id': machine_settings.peer_id
         }
         return Response(data=data, status=status.HTTP_200_OK)
-
-
-@permission_classes([])
-class ConnectMachineToMe(APIView):
-    def post(self, request):
-        print(request.data)
-        # user = request.user
-        peer_id = request.data['peer_id']
-        machine_id = request.data['machine_id']
-        return Response(status=status.HTTP_200_OK)
 
 
 @csrf_exempt
